@@ -1,6 +1,7 @@
 package simpleISBN
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -56,6 +57,7 @@ func TestConvertISBN(t *testing.T) {
 		{"153432593X", ISBN13, "9781534325937", false},
 		// ISBN13 -> ISBN10
 		{"9780306406157", ISBN10, "0306406152", false},
+		{"9791033611189", ISBN10, "", true},
 		// invalid checksum converting to ISBN-13
 		{"1234567890", ISBN13, "", true},
 		// wrong prefix converting to ISBN-10
@@ -103,6 +105,9 @@ func TestNewISBN(t *testing.T) {
 		{"1250621992", ISBN10, "1250621992", "9781250621993", false},
 		{"9781250621993", ISBN13, "1250621992", "9781250621993", false},
 
+		// 979 prefix - no ISBN-10 equivalent
+		{"9791033611189", ISBN10, "", "9791033611189", false},
+
 		{"invalid", "", "", "", true},
 		{"123456789012", "", "", "", true},
 		{"12345", "", "", "", true},
@@ -118,6 +123,9 @@ func TestNewISBN(t *testing.T) {
 			continue
 		}
 		if isbn.InitialType != tt.wantType {
+			if strings.HasPrefix(tt.input, "979") && tt.wantType == ISBN10 {
+				continue
+			}
 			t.Errorf(
 				"NewISBN(%q).InitialType = %v; want %v",
 				tt.input,

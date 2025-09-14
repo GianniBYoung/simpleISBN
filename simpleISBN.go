@@ -58,6 +58,11 @@ func NewISBN(input string) (*ISBN, error) {
 		isbn.InitialType = ISBN13
 		isbn.ISBN13Number = raw
 
+		// only 978 prefix can be converted to ISBN-10
+		if strings.HasPrefix(raw, "979") {
+			return isbn, nil
+		}
+
 		alt, err := ConvertISBN(raw, ISBN10)
 		if err != nil {
 			return nil, fmt.Errorf("converting %q → ISBN-10: %w", raw, err)
